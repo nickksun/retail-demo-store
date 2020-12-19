@@ -55,6 +55,9 @@ Parameters:
   GitHubUser:
     Type: String
 
+  DockerHubSecretArn:
+    Type: String
+
   UserPoolId:
     Type: String
 
@@ -205,6 +208,7 @@ Resources:
         GitHubBranch: !Ref GitHubBranch
         GitHubToken: !Ref GitHubToken
         GitHubUser: !Ref GitHubUser
+        DockerHubSecretArn: !Ref DockerHubSecretArn
         UserPoolId: !Ref UserPoolId
         UserPoolClientId: !Ref UserPoolClientId
         IdentityPoolId: !Ref IdentityPoolId

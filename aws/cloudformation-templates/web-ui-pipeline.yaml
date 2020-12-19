@@ -54,6 +54,9 @@ Parameters:
   GitHubUser:
     Type: String
 
+  DockerHubSecretArn:
+    Type: String
+    
   UserPoolId:
     Type: String
 
@@ -239,6 +242,16 @@ Resources:
                   - ssm:GetParameters
                   - 'cloudfront:CreateInvalidation'
                 Resource: "*"
+        - PolicyName: "secretsmanager"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - 
+                Effect: "Allow"
+                Action:
+                  - secretsmanager:*
+                Resource:  
+                  - !Ref DockerHubSecretArn
         - PolicyName: "S3"
           PolicyDocument:
             Version: "2012-10-17"
@@ -363,6 +376,8 @@ Resources:
             Value: !Ref WebRootUrl
           - Name: IMAGE_ROOT_URL
             Value: !Ref ImageRootUrl
+          - Name: DOCKER_HUB_SECRET_ARN
+            Value: !Ref DockerHubSecretArn          
         Image: 'aws/codebuild/standard:2.0'
         Type: LINUX_CONTAINER
 

@@ -24,6 +24,11 @@ Metadata:
           - GitHubBranch
           - GitHubToken
           - GitHubUser
+      - Label: 
+          default: "Docker Hub credentials"
+        Parameters: 
+          - DockerHubUser
+          - DockerHubAccessToken
       - Label:
           default: "Auto-Build Resources"
         Parameters:
@@ -55,6 +60,10 @@ Metadata:
         default: "GitHub Personal Access Token"
       GitHubUser:
         default: "GitHub Username"
+      DockerHubUser:
+        default: "DockerHub Username"
+      DockerHubAccessToken:
+        default: "DockerHub Access Token"
       PreIndexElasticsearch:
         default: "Auto-Load Elasticsearch Index"
       PreCreatePersonalizeCampaign:
@@ -84,6 +93,7 @@ Parameters:
     Description: >
       Optional path in the Deployment Resources Staging bucket where the deployment resources are stored (e.g. path/path2/). 
       Leave blank if resources are at the root of the Staging Resource Bucket. If specified, MUST end with '/'.
+    Default: ''
 
   CreateElasticsearchServiceLinkedRole:
     Type: String
@@ -126,6 +136,14 @@ Parameters:
   GitHubUser:
     Type: String
     Description: Your GitHub username.
+  
+  DockerHubUser:
+    Type: String
+    Description: Your DockerHub username
+  
+  DockerHubAccessToken:
+    Type: String
+    Description: Your DockerHub access token
 
   PreIndexElasticsearch:
     Type: String
@@ -178,16 +196,19 @@ Parameters:
     Type: String
     Description: Amplitude API key for integrated product analytics and A/B testing results (optional).
     NoEcho: true
+    Default: ''
 
   OptimizelySdkKey:
     Type: String
     Description: Optimizely SDK key for experimentation (optional).
     NoEcho: true
+    Default: ''
 
   SegmentWriteKey:
     Type: String
     Description: Segment write key for real-time data collection (optional).
     NoEcho: true
+    Default: ''
 
 Resources:
   # Base Resources
@@ -219,6 +240,7 @@ Resources:
         GitHubBranch: !Ref GitHubBranch
         GitHubToken: !Ref GitHubToken
         GitHubUser: !Ref GitHubUser
+        DockerHubSecretArn: !Ref DockerHubSecret
         UserPoolId: !GetAtt Base.Outputs.UserPoolId
         UserPoolClientId: !GetAtt Base.Outputs.UserPoolClientId
         IdentityPoolId: !GetAtt Base.Outputs.IdentityPoolId
@@ -255,6 +277,7 @@ Resources:
         GitHubBranch: !Ref GitHubBranch
         GitHubToken: !Ref GitHubToken
         GitHubUser: !Ref GitHubUser
+        DockerHubSecretArn: !Ref DockerHubSecret
         UserPoolId: !GetAtt Base.Outputs.UserPoolId
         UserPoolClientId: !GetAtt Base.Outputs.UserPoolClientId
         IdentityPoolId: !GetAtt Base.Outputs.IdentityPoolId
@@ -326,6 +349,18 @@ Resources:
       Parameters:
         ResourceBucket: !Ref ResourceBucket
         ResourceBucketRelativePath: !Ref ResourceBucketRelativePath 
+  
+  DockerHubSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: DockerHubSecret
+      Description: "DockerHub username/accesstoken"
+      SecretString: !Join ['', ['{"username": "', !Ref DockerHubUser, '"accesstoken":', !Ref DockerHubAccessToken, '"}']]
+      Tags:
+        -
+          Key: Name
+          Value: DockerHubSecret
+
         
 Outputs:
   UserPoolId:

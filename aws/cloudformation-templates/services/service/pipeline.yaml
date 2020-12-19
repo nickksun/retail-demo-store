@@ -33,6 +33,9 @@ Parameters:
   GitHubUser:
     Type: String
 
+  DockerHubSecretArn:
+    Type: String    
+
   ClusterName:
     Type: String
 
@@ -195,6 +198,16 @@ Resources:
                       - s3:PutObject
                       - s3:GetObjectVersion
                   Resource: !Sub arn:aws:s3:::${ArtifactBucket}/* 
+        - PolicyName: "secretsmanager"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - 
+                Effect: "Allow"
+                Action:
+                  - secretsmanager:*
+                Resource:  
+                  - !Ref DockerHubSecretArn
 
   CodePipelineServiceRole:
     Type: AWS::IAM::Role
@@ -207,7 +220,7 @@ Resources:
             Principal:
               Service: codepipeline.amazonaws.com
             Action: sts:AssumeRole
-      Policies:
+      Policies:        
         - PolicyName: root
           PolicyDocument:
             Version: 2012-10-17
@@ -313,6 +326,8 @@ Resources:
             Value: !Ref WebRootUrl
           - Name: IMAGE_ROOT_URL
             Value: !Ref ImageRootUrl
+          - Name: DOCKER_HUB_SECRET_ARN
+            Value: !Ref DockerHubSecretArn
       Name: !Ref AWS::StackName
       ServiceRole: !Ref CodeBuildServiceRole
 
