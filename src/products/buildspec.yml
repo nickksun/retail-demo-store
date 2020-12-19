@@ -2,6 +2,7 @@ version: 0.2
 phases:
   pre_build:
     commands:
+      - yum install -y jq
       - DOCKER_USERNAME=$(aws secretsmanager get-secret-value --secret-id $DOCKER_HUB_SECRET_ARN --query SecretString --output text  | jq --raw-output .username)
       - aws secretsmanager get-secret-value --secret-id $DOCKER_HUB_SECRET_ARN --query SecretString --output text  | jq --raw-output .accesstoken > .docker.key
       - docker login -u $DOCKER_USERNAME --password-stdin < .docker.key      
