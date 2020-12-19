@@ -2,9 +2,9 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - yum install -y jq
-      - DOCKER_USERNAME=$(aws secretsmanager get-secret-value --secret-id $DOCKER_HUB_SECRET_ARN --query SecretString --output text  | jq --raw-output .username)
-      - aws secretsmanager get-secret-value --secret-id $DOCKER_HUB_SECRET_ARN --query SecretString --output text  | jq --raw-output .accesstoken > .docker.key
+      - curl -o jq https://stedolan.github.io/jq/download/linux64/jq && chmod +x ./jq
+      - DOCKER_USERNAME=$(aws secretsmanager get-secret-value --secret-id $DOCKER_HUB_SECRET_ARN --query SecretString --output text  | ./jq --raw-output .username)
+      - aws secretsmanager get-secret-value --secret-id $DOCKER_HUB_SECRET_ARN --query SecretString --output text  | ./jq --raw-output .accesstoken > .docker.key
       - docker login -u $DOCKER_USERNAME --password-stdin < .docker.key      
       - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
       - IMAGE_URI="${REPOSITORY_URI}:${TAG}"
